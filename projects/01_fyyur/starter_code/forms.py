@@ -1,30 +1,32 @@
-from datetime import datetime
+from datetime import datetime, time
 from flask_wtf import Form
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField, BooleanField, IntegerField, TimeField
+from wtforms.validators import DataRequired, AnyOf, URL, ValidationError, Optional
+
 
 class ShowForm(Form):
-    artist_id = StringField(
-        'artist_id'
+    artist_id = SelectField(
+        'Artist', description='Artist', validators=[DataRequired()]
     )
-    venue_id = StringField(
-        'venue_id'
+    venue_id = SelectField(
+        'Venue', description='Venue', validators=[DataRequired()]
     )
     start_time = DateTimeField(
-        'start_time',
+        'Start Time', description='Start Time',
         validators=[DataRequired()],
-        default= datetime.today()
+        default=datetime.today()
     )
+
 
 class VenueForm(Form):
     name = StringField(
-        'name', validators=[DataRequired()]
+        'Name', description='Name', validators=[DataRequired()]
     )
     city = StringField(
-        'city', validators=[DataRequired()]
+        'City', description='City', validators=[DataRequired()]
     )
     state = SelectField(
-        'state', validators=[DataRequired()],
+        'State', description='State', validators=[DataRequired()],
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -80,17 +82,13 @@ class VenueForm(Form):
         ]
     )
     address = StringField(
-        'address', validators=[DataRequired()]
+        'Address', description='Address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
-    )
-    image_link = StringField(
-        'image_link'
+        'Phone', description='Phone'
     )
     genres = SelectMultipleField(
-        # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
+        'Genres', validators=[DataRequired()], description='Genres',
         choices=[
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
@@ -113,19 +111,37 @@ class VenueForm(Form):
             ('Other', 'Other'),
         ]
     )
-    facebook_link = StringField(
-        'facebook_link', validators=[URL()]
+    website = StringField(
+        'Website', validators=[URL(), Optional()], description='Website'
     )
+    facebook_link = StringField(
+        'Facebook Link', validators=[URL(), Optional()], description='Facebook Link'
+    )
+    image_link = StringField(
+        'Image Link', validators=[URL(), Optional()], description='Image Link'
+    )
+    seeking_talent = BooleanField(
+        'Seeking Talent', description='Seeking Talent'
+    )
+    seeking_description = StringField(
+        'Seeking Description', description='Seeking Description'
+    )
+
+    def validate_seeking_description(form, field):
+        if form.seeking_talent.data:
+            if form.seeking_description.data == '':
+                raise ValidationError("Must provide a seeking description")
+
 
 class ArtistForm(Form):
     name = StringField(
-        'name', validators=[DataRequired()]
+        'Name', validators=[DataRequired()], description='Name'
     )
     city = StringField(
-        'city', validators=[DataRequired()]
+        'City', validators=[DataRequired()], description='City'
     )
     state = SelectField(
-        'state', validators=[DataRequired()],
+        'State', description='State', validators=[DataRequired()],
         choices=[
             ('AL', 'AL'),
             ('AK', 'AK'),
@@ -181,15 +197,10 @@ class ArtistForm(Form):
         ]
     )
     phone = StringField(
-        # TODO implement validation logic for state
-        'phone'
-    )
-    image_link = StringField(
-        'image_link'
+        'Phone', description='Phone'
     )
     genres = SelectMultipleField(
-        # TODO implement enum restriction
-        'genres', validators=[DataRequired()],
+        'Genres', description='Genres', validators=[DataRequired()],
         choices=[
             ('Alternative', 'Alternative'),
             ('Blues', 'Blues'),
@@ -213,8 +224,29 @@ class ArtistForm(Form):
         ]
     )
     facebook_link = StringField(
-        # TODO implement enum restriction
-        'facebook_link', validators=[URL()]
+        'Facebook Link', validators=[URL(), Optional()], description='Facebook Link'
+    )
+    image_link = StringField(
+        'Image Link', validators=[URL(), Optional()], description='Image Link'
+    )
+    website = StringField(
+        'Website', validators=[URL(), Optional()], description='Website'
+    )
+    seeking_venue = BooleanField(
+        'Seeking Venue', description='Seeking Venue'
+    )
+    seeking_description = StringField(
+        'Seeking Description', description='Seeking Description'
     )
 
-# TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
+    def validate_seeking_description(form, field):
+        if form.seeking_venue.data:
+            if form.seeking_description.data == '':
+                raise ValidationError("Must provide a seeking description")
+
+    available_from = TimeField(
+        'Available From', default=time().min, description='Available From'
+    )
+    available_to = TimeField(
+        'Available To', default=time().max, description='Available To'
+    )
