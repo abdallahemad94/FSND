@@ -68,13 +68,11 @@ One note before you delve into your tasks: for each endpoint you are expected to
 
 REVIEW_COMMENT
 ```
-This README is missing documentation of your endpoints. Below is an example for your endpoint to get all categories. Please use it as a reference for creating your documentation and resubmit your code. 
-
+API and Endpoints documentation updated for submission
 Endpoints
-GET '/categories'
-GET ...
-POST ...
-DELETE ...
+GET '/categories', '/questions', '/categories/<int:category_id>/questions'
+POST '/questions', '/questions/search','/quizzes'
+DELETE '/questions/<int:question_id>'
 
 GET '/categories'
 - Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
@@ -87,6 +85,70 @@ GET '/categories'
 '5' : "Entertainment",
 '6' : "Sports"}
 
+GET '/questions'
+- usage: get all questions
+- Returns: a dictionary with all questions, number of questions, dictionary od categories, current category
+- Request query params: page_no
+- Returns: An object with four keys
+    1) questions: a list that contains the questions,
+    2) total_questions: number of question
+    3) categories: a dictionary of categories key is the id and value is the category_string
+    4) current_category: dictionary  that contains selected category
+{"questions": [],
+    "total_questions": 0,
+    "categories": {0: "", 1: "", 2: ""},
+    "current_category": {0: ""}}
+
+GET /categories/<int:category_id>/questions'
+- usage: filter question by specific category
+- Returns: a list of all questions in a specific category
+- Request argument: category_id
+- Returns: An object with three keys
+    1) questions: a list that contains the questions filterd by selected category,
+    2) total_questions: number of questions returnd
+    4) current_category: dictionary that contains selected category
+{"questions": [],
+    "total_questions": 0,
+    "current_category": {0: ""}}
+
+POST '/questions'
+- usage: used to insert a new question
+- returns: a dictinary with status code and success flag and the inserted question  
+- Request argument: new question data as json 
+{question="",
+    answer="",
+    category=0,    # category_id
+    difficulty=0}
+- Returns: 
+{"success": true,
+    "status_code": 201,
+    "question": question.format()}
+
+POST '/questions/search'
+- usage: search question by specific search term and returns all that contains the search term
+- Request argument: new question data as json 
+{"searchTerm": ""}
+- Returns: 
+{"questions": [search results],
+    "total_questions": 0,
+    "current_category": {category_id: category_string}}
+
+POST '/quizzes'
+- usage: gets a random question from a specific category if previous_questions is supplied will not repeat the question again
+- Request argument: dictionary with the category id and list of ids of preveious questions
+{"quiz_category": {id: category_string},
+"previous_questions": [question_id]}
+- Returns: 
+{"question": {id: 0, question: "", answer: "", category:"", deficulty: ""}}
+
+
+DELETE '/questions/<int:question_id>'
+- usage: delete a question 
+- Request argument: question id
+{"quiz_category": {id: category_string},
+"previous_questions": [question_id]}
+- Returns: 
+{"question": {id: 0, question: "", answer: "", category:"", deficulty: ""}}
 ```
 
 
