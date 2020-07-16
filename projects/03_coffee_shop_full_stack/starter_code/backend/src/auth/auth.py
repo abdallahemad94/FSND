@@ -4,16 +4,17 @@ from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
 
-
-AUTH0_DOMAIN = 'udacity-fsnd.auth0.com'
+AUTH0_DOMAIN = 'udacity-coffee-shop-app.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'dev'
+API_AUDIENCE = 'https://Api.UdacityCoffeeShop.com'
 
 ## AuthError Exception
 '''
 AuthError Exception
 A standardized way to communicate auth failure modes
 '''
+
+
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
@@ -30,8 +31,20 @@ class AuthError(Exception):
         it should raise an AuthError if the header is malformed
     return the token part of the header
 '''
+
+
 def get_token_auth_header():
-   raise Exception('Not Implemented')
+    authorization = request.headers.get("Authorization", None)
+    if not authorization:
+        raise AuthError({"code": "not_permitted",
+                         "description": "no header is present"}, 401)
+    parts = authorization.split(" ")
+    if len(parts) != 2 or parts[0].lower() != 'bearer':
+        raise AuthError({"code": "not_permitted",
+                         "description": "the header is malformed"}, 401)
+
+    return authorization.split(" ")[1]
+
 
 '''
 @TODO implement check_permissions(permission, payload) method
@@ -44,8 +57,15 @@ def get_token_auth_header():
     it should raise an AuthError if the requested permission string is not in the payload permissions array
     return true otherwise
 '''
+
+
 def check_permissions(permission, payload):
-    raise Exception('Not Implemented')
+    if permission in payload.get('permissions', []):
+        return True
+    else:
+        raise AuthError({"code": "not_permitted",
+                         "description": "endpoint not permitted"}, 403)
+
 
 '''
 @TODO implement verify_decode_jwt(token) method
@@ -60,8 +80,46 @@ def check_permissions(permission, payload):
 
     !!NOTE urlopen has a common certificate error described here: https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
 '''
+
+
 def verify_decode_jwt(token):
-    raise Exception('Not Implemented')
+    json_url = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    jwks = json.loads(json_url.read())
+    unverified_header = jwt.get_unverified_header(token)
+    rsa_key = {}
+    for key in jwks["keys"]:
+        if key["kid"] == unverified_header["kid"]:
+            rsa_key = {
+                "kty": key["kty"],
+                "kid": key["kid"],
+                "use": key["use"],
+                "n": key["n"],
+                "e": key["e"]
+            }
+    if rsa_key:
+        try:
+            payload = jwt.decode(
+                token,
+                rsa_key,
+                algorithms=ALGORITHMS,
+                audience=API_AUDIENCE,
+                issuer=f"https://{AUTH0_DOMAIN}/"
+            )
+        except jwt.ExpiredSignatureError:
+            raise AuthError({"code": "token_expired",
+                             "description": "token is expired"}, 401)
+        except jwt.JWTClaimsError:
+            raise AuthError({"code": "invalid_claims",
+                             "description":
+                                 "incorrect claims,"
+                                 "please check the audience and issuer"}, 401)
+        except Exception:
+            raise AuthError({"code": "invalid_header",
+                             "description":
+                                 "Unable to parse authentication"
+                                 " token."}, 401)
+
+    return payload
 
 '''
 @TODO implement @requires_auth(permission) decorator method
@@ -73,6 +131,8 @@ def verify_decode_jwt(token):
     it should use the check_permissions method validate claims and check the requested permission
     return the decorator which passes the decoded payload to the decorated method
 '''
+
+
 def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
@@ -83,4 +143,5 @@ def requires_auth(permission=''):
             return f(payload, *args, **kwargs)
 
         return wrapper
+
     return requires_auth_decorator
