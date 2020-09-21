@@ -1,0 +1,53 @@
+version: '3.8'
+services:
+  casting-postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: &dbUser postgres
+      POSTGRES_PASSWORD: &dbPass postgres
+      POSTGRES_DB: &dbname casting
+    ports:
+      - 5432:5432
+    networks:
+      flask-postgres:
+    volumes:
+      - "dbdata:/var/lib/postgresql/data"
+    container_name: casting-postgress
+  casting-flask:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    depends_on:
+      - casting-postgres
+    links:
+      - casting-postgres
+    ports:
+      - 5000:5000
+    networks:
+      flask-postgres:
+      angular-flask:
+    environment:
+      FLASK_ENV: 'production'
+      POSTGRES_HOST: 'casting-postgres'
+      POSTGRES_USER: *dbUser
+      POSTGRES_PASSWORD: *dbPass
+      POSTGRES_DB: *dbname
+    container_name: casting-flask
+  casting-angular:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    depends_on:
+      - casting-flask
+    links:
+      - casting-flask
+    ports:
+      - 4200:4200
+    networks:
+      angular-flask:
+    container_name: casting-angular
+networks:
+  flask-postgres:
+  angular-flask:
+volumes:
+  dbdata:

@@ -1,0 +1,39 @@
+<nav aria-label="breadcrumb" class="mt-2">
+  <a href="/"><i class="fas fa-arrow-left"></i></a>
+  <ol class="breadcrumb d-inline-flex">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="/artists">Artists</a></li>
+    <li class="breadcrumb-item active" *ngIf="artistId"><a>Edit ({{artist.name}})</a></li>
+    <li class="breadcrumb-item active" *ngIf="!artistId"><a>New</a></li>
+  </ol>
+</nav>
+<form method="post" class="form needs-validation" id="form" #f="ngForm">
+  <div class="form-group">
+    <label for="name" class="text-info">Name</label>
+    <input type="text" id="name" class="form-control" name="name" placeholder="Jhonny Depp" required="required" [(ngModel)]="artist.name">
+  </div>
+  <div class="form-group">
+    <label for="age" class="text-info">Age</label>
+    <input type="number" id="age" class="form-control" name="age" min="0" step="1" required="required" [(ngModel)]="artist.age">
+  </div>
+  <div class="form-group">
+    <label  class="text-info mr-3">Gender</label>
+    <div class="btn-group btn-group-toggle ml-3">
+      <label class="btn btn-secondary" [class.active]="artist.gender == 'Male'">
+        <input type="radio" name="gender" id="Male" [value]="'Male'" [(ngModel)]="artist.gender" > Male
+      </label>
+      <label class="btn btn-secondary" [class.active]="artist.gender == 'Female'">
+        <input type="radio" name="gender" id="Female" [value]="'Female'" [(ngModel)]="artist.gender"> Female
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="image" class="text-info"></label>
+    <input id="image" class="form-control" type="url" name="image" placeholder="https://url.com/image.jpg" [(ngModel)]="artist.image">
+  </div>
+  <div class="form-group">
+    <label for="description" class="text-info"></label>
+    <textarea id="description" [(ngModel)]="artist.description" name="description" class="form-control"></textarea>
+  </div>
+  <input type="submit" value="submit" class="btn btn-primary" (click)="submit()" [disabled]="f.invalid">
+</form>

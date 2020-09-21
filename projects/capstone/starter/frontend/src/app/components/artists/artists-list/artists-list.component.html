@@ -1,0 +1,24 @@
+<nav aria-label="breadcrumb" class="mt-2">
+  <a href="/"><i class="fas fa-arrow-left"></i></a>
+  <ol class="breadcrumb d-inline-flex">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item active"><a>Artists</a></li>
+  </ol>
+  <a [routerLink]="['new']" class="btn btn-warning text-white float-right btn-sm">Add Artist</a>
+</nav>
+<div class="row">
+  <div class="col-xs-12">
+    <ul class="list-group m-2" *ngIf="artists">
+      <li class="list-group-item col-xs-12 col-md-6 p-0" *ngFor="let artist of artists">
+        <a [routerLink]="[artist.id]" class="col-xs-6 p-2">
+          <i class='fas fa-user mr-3' aria-hidden="true"></i>
+          <h5 class="d-inline">{{ artist.name }}</h5>
+        </a>
+        <button class="btn btn-danger btn-sm m-2" (click)="deleteArtist(artist.id)">
+          <i class='fas fa-trash'></i>
+        </button>
+      </li>
+    </ul>
+    <h3 class="text-info m-auto text-center align-middle" *ngIf="!artists"> Sorry no artists found</h3>
+  </div>
+</div>

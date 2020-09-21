@@ -1,0 +1,28 @@
+<nav aria-label="breadcrumb" class="mt-2">
+  <a href="/"><i class="fas fa-arrow-left"></i></a>
+  <ol class="breadcrumb d-inline-flex">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    <li class="breadcrumb-item"><a href="/movies">Movies</a></li>
+    <li class="breadcrumb-item active" *ngIf="movieId"><a>Edit ({{movie.name}})</a></li>
+    <li class="breadcrumb-item active" *ngIf="!movieId"><a>New</a></li>
+  </ol>
+</nav>
+<form method="post" class="form needs-validation" id="form" #f="ngForm">
+  <div class="form-group">
+    <label for="name" class="text-info">Name</label>
+    <input type="text" id="name" class="form-control" name="name" placeholder="Jhonny Depp" required="required" [(ngModel)]="movie.name">
+  </div>
+  <div class="form-group">
+    <label for="releaseDate" class="text-info">Release Date</label>
+    <input type="date" id="releaseDate" class="form-control" name="releaseDate" required="required" [ngModel]="movie.release_date | date: 'yyyy-MM-dd'" (ngModelChange)="changeDate($event)">
+  </div>
+  <div class="form-group">
+    <label for="image" class="text-info"></label>
+    <input id="image" class="form-control" type="url" name="image" placeholder="https://url.com/image.jpg" [(ngModel)]="movie.image">
+  </div>
+  <div class="form-group">
+    <label for="description" class="text-info"></label>
+    <textarea id="description" [(ngModel)]="movie.description" name="description" class="form-control"></textarea>
+  </div>
+  <input type="submit" value="submit" class="btn btn-primary" (click)="submit()" [disabled]="f.invalid">
+</form>
