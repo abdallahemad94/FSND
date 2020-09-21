@@ -1,5 +1,5 @@
 FROM python:3.7
-COPY ./ /app/casting/backend
+COPY ./backend /app/casting/backend
 WORKDIR /app/casting/backend
 RUN python -m pip install --upgrade pip
 RUN pip install -r requirements.txt
